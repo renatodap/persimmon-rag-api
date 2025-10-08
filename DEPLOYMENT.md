@@ -1,14 +1,14 @@
 # Deployment Guide - Railway
 
-Complete guide to deploying Recall Notebook backend to Railway.
+Complete guide to deploying Recall Notebook API to Railway.
 
 ## Prerequisites
 
-1. Railway account (https://railway.app)
-2. Railway CLI installed: `npm install -g @railway/cli`
-3. All environment variables ready
-4. Supabase project configured
-5. Redis instance (Railway provides free Redis addon)
+1. **Railway account** (https://railway.app)
+2. **Railway CLI** installed: `npm install -g @railway/cli`
+3. **All environment variables** ready (see `.env.example`)
+4. **Supabase project** configured with pgvector extension
+5. **Redis instance** (Railway provides free Redis addon)
 
 ## Step-by-Step Deployment
 
@@ -27,11 +27,11 @@ railway login
 ### 3. Create New Railway Project
 
 ```bash
-cd backend
+# In the root of recall-notebook-api repository
 railway init
 ```
 
-Select "Create new project" and give it a name (e.g., "recall-notebook-backend").
+Select "Create new project" and give it a name (e.g., "recall-notebook-api" or "recall-knowledge-api").
 
 ### 4. Add Redis Addon
 
@@ -54,12 +54,15 @@ railway variables set ANTHROPIC_API_KEY=your_anthropic_key
 railway variables set GOOGLE_GEMINI_API_KEY=your_gemini_key
 railway variables set OPENAI_API_KEY=your_openai_key
 railway variables set JWT_SECRET=your_jwt_secret_32chars_minimum
+railway variables set WEBHOOK_SECRET=your_webhook_secret_for_hmac_signatures
 railway variables set ENVIRONMENT=production
 railway variables set LOG_LEVEL=INFO
 railway variables set ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
 ```
 
-**Important**: Railway automatically sets `PORT` and `REDIS_URL`, so you don't need to set these manually.
+**Important**:
+- Railway automatically sets `PORT` and `REDIS_URL`, so you don't need to set these manually.
+- `JWT_SECRET` and `WEBHOOK_SECRET` must be at least 32 characters for security.
 
 ### 6. Deploy to Railway
 
@@ -107,15 +110,19 @@ Visit: `https://your-app.railway.app/docs`
 
 This opens the interactive Swagger UI where you can test all endpoints.
 
-## Update Frontend to Use Railway Backend
+## Connect Frontend to Railway Backend
 
-In your Next.js frontend `.env.local`:
+If you're using the [recall-notebook](https://github.com/yourusername/recall-notebook) frontend, update its `.env.local`:
 
 ```bash
 NEXT_PUBLIC_API_URL=https://your-app.railway.app
 ```
 
-Update API calls in frontend to use this URL instead of `/api`.
+The frontend will automatically use this URL for all API calls.
+
+**For other clients** (agents, custom apps):
+- Use the Railway URL: `https://your-app.railway.app`
+- See [Agent API Guide](docs/AGENT_API_GUIDE.md) for integration examples
 
 ## Monitoring & Maintenance
 

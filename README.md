@@ -1,8 +1,29 @@
-# Recall Notebook Backend
+# Recall Notebook API
 
-FastAPI backend for Recall Notebook - AI-powered knowledge management system.
+**FastAPI backend for AI-powered knowledge management and RAG (Retrieval-Augmented Generation)**
 
-**🤖 Perfect for RAG Agents**: This API is designed as a **knowledge backend** for AI agents. It provides embeddings generation, semantic search, and content storage - everything you need for Retrieval-Augmented Generation (RAG). See the [Agent API Guide](docs/AGENT_API_GUIDE.md) to get started.
+This is a production-ready knowledge API designed specifically for RAG agents and AI applications. It provides:
+- 🆓 **FREE embeddings** (Google Gemini with OpenAI fallback)
+- 🔍 **Hybrid search** (semantic + keyword with pgvector)
+- 📦 **Batch operations** (process 100 embeddings or 50 sources at once)
+- 🔔 **Real-time webhooks** (get notified when events occur)
+- 🔐 **Built-in auth** (JWT via Supabase)
+- 📊 **Production-ready** (rate limiting, logging, error handling)
+
+**Perfect for:**
+- Building RAG chatbots
+- Knowledge management systems
+- Research assistants
+- Document processing pipelines
+- Multi-agent systems
+
+> **Note**: This repository contains only the backend API. For the web UI client, see [recall-notebook](https://github.com/yourusername/recall-notebook).
+
+## 🚀 Quick Start for Agent Developers
+
+See the [**Agent API Guide**](docs/AGENT_API_GUIDE.md) (150+ pages) for complete integration instructions, examples in Python/TypeScript, and RAG patterns.
+
+**Live Demo API**: https://your-app.railway.app (replace with your Railway URL)
 
 ## Features
 
@@ -38,10 +59,11 @@ FastAPI backend for Recall Notebook - AI-powered knowledge management system.
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Clone and Install
 
 ```bash
-cd backend
+git clone https://github.com/yourusername/recall-notebook-api.git
+cd recall-notebook-api
 poetry install
 ```
 
@@ -49,21 +71,34 @@ poetry install
 
 ```bash
 cp .env.example .env
-# Edit .env with your credentials
+# Edit .env with your API keys and credentials
+```
+
+**Required environment variables:**
+```
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_KEY=your_supabase_service_role_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+GOOGLE_GEMINI_API_KEY=your_google_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+JWT_SECRET=your_jwt_secret_32+_chars
+WEBHOOK_SECRET=your_webhook_secret
 ```
 
 ### 3. Run Development Server
 
 ```bash
-poetry run python -m app.main
-# OR
 poetry run uvicorn app.main:app --reload
 ```
 
+Server starts at: http://localhost:8000
+
 ### 4. Access API Documentation
 
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- 📘 **Swagger UI**: http://localhost:8000/docs (interactive API testing)
+- 📕 **ReDoc**: http://localhost:8000/redoc (beautiful documentation)
+- ✅ **Health Check**: http://localhost:8000/health
 
 ## 🤖 For AI Agent Developers
 
@@ -314,20 +349,50 @@ railway up
 ## Project Structure
 
 ```
-backend/
+recall-notebook-api/
 ├── app/
-│   ├── main.py              # FastAPI app
-│   ├── config.py            # Settings
+│   ├── main.py              # FastAPI application entry point
+│   ├── config.py            # Environment configuration
 │   ├── api/
-│   │   └── v1/              # API routes
-│   ├── core/                # Auth, errors, logging
+│   │   └── v1/              # API v1 routes
+│   │       ├── sources.py   # Sources CRUD
+│   │       ├── collections.py
+│   │       ├── search.py    # Hybrid search
+│   │       ├── embeddings.py # Batch embeddings
+│   │       └── webhooks.py  # Real-time events
+│   ├── core/                # Core utilities
+│   │   ├── auth.py          # JWT authentication
+│   │   ├── errors.py        # Error handling
+│   │   ├── rate_limit.py    # Rate limiting
+│   │   └── logging_config.py
 │   ├── models/              # Pydantic models
+│   │   ├── source.py
+│   │   ├── embedding.py
+│   │   └── webhook.py
 │   ├── services/            # Business logic
+│   │   ├── ai_service.py    # Claude integration
+│   │   ├── embedding_service.py # Gemini/OpenAI
+│   │   ├── webhook_service.py
+│   │   └── supabase_service.py
 │   └── utils/               # Helpers
-├── tests/                   # Tests
-├── pyproject.toml           # Dependencies
-├── Procfile                # Railway
-└── railway.toml            # Railway config
+├── migrations/              # SQL migrations
+│   └── 001_webhooks.sql
+├── docs/                    # Documentation
+│   ├── AGENT_API_GUIDE.md   # Primary documentation (150+ pages)
+│   ├── CHANGELOG.md         # Version history
+│   └── examples/            # Code examples
+│       ├── python_langchain_agent.py
+│       ├── python_custom_agent.py
+│       ├── typescript_agent.ts
+│       └── curl_examples.sh
+├── tests/                   # Test suite
+│   ├── unit/
+│   └── integration/
+├── pyproject.toml           # Poetry dependencies
+├── Procfile                 # Railway deployment
+├── railway.toml             # Railway config
+├── .env.example             # Environment template
+└── README.md                # This file
 ```
 
 ## Environment Variables
@@ -339,6 +404,26 @@ See `.env.example` for all required variables.
 **Current Version:** 1.1.0
 
 See [CHANGELOG.md](docs/CHANGELOG.md) for version history and release notes.
+
+## Related Repositories
+
+- **[recall-notebook](https://github.com/yourusername/recall-notebook)** - Web UI client for this API (Next.js)
+- **[Your RAG agent](https://github.com/yourusername/your-agent)** - Example agent using this API
+
+## Contributing
+
+Contributions are welcome! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## Support
+
+- 📖 **Documentation**: [Agent API Guide](docs/AGENT_API_GUIDE.md)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/recall-notebook-api/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/recall-notebook-api/discussions)
 
 ## License
 
