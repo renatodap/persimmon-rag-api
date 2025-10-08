@@ -17,7 +17,7 @@ This is a production-ready knowledge API designed specifically for RAG agents an
 - Document processing pipelines
 - Multi-agent systems
 
-> **Note**: This repository contains only the backend API. For the web UI client, see [recall-notebook](https://github.com/renatodap/recall-notebook).
+> **Note**: This repository contains only the backend API. For the web UI client, see [notebook-recall](https://github.com/renatodap/notebook-recall).
 
 ## 🚀 Quick Start for Agent Developers
 
@@ -407,7 +407,7 @@ See [CHANGELOG.md](docs/CHANGELOG.md) for version history and release notes.
 
 ## Related Repositories
 
-- **[recall-notebook](https://github.com/renatodap/recall-notebook)** - Web UI client for this API (Next.js)
+- **[notebook-recall](https://github.com/renatodap/notebook-recall)** - Web UI client for this API (Next.js)
 - **[Your RAG agent](https://github.com/renatodap/your-agent)** - Example agent using this API
 
 ## Contributing
