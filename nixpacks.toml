@@ -9,8 +9,8 @@ cmds = [
 
 [phases.build]
 cmds = [
-  "pip install poetry && poetry config virtualenvs.create false && poetry install --without dev --no-root"
+  "/opt/venv/bin/pip install poetry && /opt/venv/bin/poetry config virtualenvs.create false && /opt/venv/bin/poetry install --without dev --no-root"
 ]
 
 [start]
-cmd = ". /opt/venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+cmd = "/opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port $PORT"
