@@ -11,7 +11,7 @@ cmds = [
 cmds = [
   ". /opt/venv/bin/activate && pip install poetry",
   ". /opt/venv/bin/activate && poetry config virtualenvs.create false",
-  ". /opt/venv/bin/activate && poetry install --no-root --only main"
+  ". /opt/venv/bin/activate && poetry install --no-root --without dev"
 ]
 
 [start]
