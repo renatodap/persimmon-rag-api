@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     # Rate Limiting
     REDIS_URL: str = Field("redis://localhost:6379", description="Redis URL for rate limiting")
 
+    # Webhooks
+    WEBHOOK_SECRET: str = Field(
+        "default-webhook-secret-change-in-production",
+        description="Secret for signing webhook payloads",
+    )
+
     # Server
     PORT: int = Field(8000, description="Server port")
     HOST: str = Field("0.0.0.0", description="Server host")

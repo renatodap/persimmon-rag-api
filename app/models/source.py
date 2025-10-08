@@ -206,3 +206,93 @@ class SummarizeResponse(BaseModel):
     key_actions: List[str]
     topics: List[str]
     word_count: int
+
+
+# Batch Sources Models
+
+
+class BatchSourceItem(BaseModel):
+    """Single item in batch source creation request."""
+
+    title: Optional[str] = Field(None, max_length=500, description="Source title")
+    content_type: str = Field(..., description="Content type: text, url, pdf, image")
+    original_content: str = Field(..., min_length=1, description="Original content text")
+    url: Optional[str] = Field(None, description="Source URL if applicable")
+    summary_text: str = Field(..., min_length=1, description="AI-generated summary")
+    key_actions: List[str] = Field(default_factory=list, description="Key actions extracted")
+    key_topics: List[str] = Field(default_factory=list, description="Key topics/tags")
+    word_count: int = Field(..., ge=0, description="Word count of original content")
+    index: int = Field(..., ge=0, description="Index in batch for tracking")
+
+    @field_validator("content_type")
+    @classmethod
+    def validate_content_type(cls, v: str) -> str:
+        """Validate content type."""
+        allowed = ["text", "url", "pdf", "image"]
+        if v not in allowed:
+            raise ValueError(f"content_type must be one of {allowed}")
+        return v
+
+
+class BatchCreateSourcesRequest(BaseModel):
+    """Request model for batch source creation."""
+
+    items: List[BatchSourceItem] = Field(
+        ..., min_length=1, max_length=50, description="List of sources to create (max 50)"
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "items": [
+                    {
+                        "title": "ML Article 1",
+                        "content_type": "url",
+                        "original_content": "Content here...",
+                        "url": "https://example.com/ml1",
+                        "summary_text": "Summary here...",
+                        "key_actions": ["Study", "Practice"],
+                        "key_topics": ["ML", "AI"],
+                        "word_count": 500,
+                        "index": 0,
+                    }
+                ]
+            }
+        }
+
+
+class BatchSourceResult(BaseModel):
+    """Result for a single item in batch source creation."""
+
+    index: int = Field(..., description="Original index from request")
+    success: bool = Field(..., description="Whether source creation succeeded")
+    source_id: Optional[str] = Field(None, description="Created source ID if successful")
+    error: Optional[str] = Field(None, description="Error message if failed")
+    source: Optional[dict] = Field(None, description="Full source data if successful")
+
+
+class BatchCreateSourcesResponse(BaseModel):
+    """Response model for batch source creation."""
+
+    results: List[BatchSourceResult]
+    total: int = Field(..., description="Total items in batch")
+    successful: int = Field(..., description="Number of successful creations")
+    failed: int = Field(..., description="Number of failed creations")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "results": [
+                    {
+                        "index": 0,
+                        "success": True,
+                        "source_id": "uuid-here",
+                        "error": None,
+                        "source": {"id": "uuid", "title": "ML Article 1"},
+                    }
+                ],
+                "total": 1,
+                "successful": 1,
+                "failed": 0,
+            }
+        }

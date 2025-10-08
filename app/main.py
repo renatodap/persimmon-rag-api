@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="Recall Notebook API",
     description="AI-powered knowledge management backend",
-    version="1.0.0",
+    version="1.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
@@ -75,7 +75,7 @@ async def health_check() -> dict[str, str]:
 
 
 # Import routers
-from app.api.v1 import sources, collections, search, embeddings
+from app.api.v1 import sources, collections, search, embeddings, webhooks
 from app.core.errors import (
     RecallNotebookException,
     recall_notebook_exception_handler,
@@ -94,6 +94,7 @@ app.include_router(sources.router, prefix="/api/v1", tags=["sources"])
 app.include_router(collections.router, prefix="/api/v1", tags=["collections"])
 app.include_router(search.router, prefix="/api/v1", tags=["search"])
 app.include_router(embeddings.router, prefix="/api/v1", tags=["embeddings"])
+app.include_router(webhooks.router, prefix="/api/v1", tags=["webhooks"])
 
 
 if __name__ == "__main__":

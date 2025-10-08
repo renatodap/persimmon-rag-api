@@ -21,6 +21,8 @@ from app.models.source import (
     SummarizeRequest,
     SummarizeResponse,
     UpdateSourceRequest,
+    BatchCreateSourcesRequest,
+    BatchCreateSourcesResponse,
 )
 from app.services.ai_service import ai_service
 from app.services.content_processor import content_processor
@@ -322,4 +324,127 @@ async def summarize_content(
 
     except Exception as e:
         logger.error("summarize_error", error=str(e), user_id=current_user["user_id"])
+        return handle_api_error(e)
+
+
+@router.post("/sources/batch", response_model=BatchCreateSourcesResponse, status_code=status.HTTP_201_CREATED)
+async def create_batch_sources(
+    request: BatchCreateSourcesRequest,
+    current_user: CurrentUser,
+) -> JSONResponse:
+    """
+    Create multiple sources in batch.
+
+    Processes up to 50 sources sequentially with individual error handling.
+    Each source gets AI-generated title (if missing), embedding, and tags.
+
+    Args:
+        request: Batch of sources to create
+        current_user: Authenticated user
+
+    Returns:
+        Batch results with success/failure per source
+    """
+    try:
+        user_id = current_user["user_id"]
+
+        # Rate limiting
+        await check_rate_limit(user_id, RATE_LIMITS["SOURCE_CREATION"])
+
+        logger.info("batch_source_creation_started", user_id=user_id, count=len(request.items))
+
+        results = []
+        supabase = supabase_service.get_client()
+
+        # Process each source sequentially (could be parallel, but db constraints)
+        for item in request.items:
+            try:
+                # Generate title if not provided
+                title = item.title
+                if not title or title.strip() == "" or title == "Untitled":
+                    title = await ai_service.generate_title(item.original_content, item.content_type)
+
+                # Create source
+                source_data = {
+                    "user_id": user_id,
+                    "title": title,
+                    "content_type": item.content_type,
+                    "original_content": item.original_content,
+                    "url": item.url,
+                }
+
+                source_result = supabase.table("sources").insert(source_data).execute()
+                source = source_result.data[0]
+
+                # Generate embedding
+                text_to_embed = f"{item.summary_text} {' '.join(item.key_topics)}"
+                embedding_result = await embedding_service.generate_embedding(text_to_embed, "summary")
+
+                # Create summary with embedding
+                summary_data = {
+                    "source_id": source["id"],
+                    "summary_text": item.summary_text,
+                    "key_actions": item.key_actions,
+                    "key_topics": item.key_topics,
+                    "word_count": item.word_count,
+                    "embedding": embedding_result["embedding"],
+                }
+
+                summary_result = supabase.table("summaries").insert(summary_data).execute()
+                summary = summary_result.data[0]
+
+                # Create tags
+                if item.key_topics:
+                    tags_data = [
+                        {"source_id": source["id"], "tag_name": topic.lower()}
+                        for topic in item.key_topics
+                    ]
+                    supabase.table("tags").insert(tags_data).execute()
+
+                # Success result
+                results.append({
+                    "index": item.index,
+                    "success": True,
+                    "source_id": source["id"],
+                    "error": None,
+                    "source": {"source": source, "summary": summary},
+                })
+
+                logger.info("batch_source_created", source_id=source["id"], index=item.index)
+
+            except Exception as item_error:
+                # Failure result
+                logger.warning("batch_source_failed", index=item.index, error=str(item_error))
+                results.append({
+                    "index": item.index,
+                    "success": False,
+                    "source_id": None,
+                    "error": str(item_error),
+                    "source": None,
+                })
+
+        # Calculate statistics
+        successful = sum(1 for r in results if r["success"])
+        failed = len(results) - successful
+
+        logger.info(
+            "batch_source_creation_complete",
+            user_id=user_id,
+            total=len(results),
+            successful=successful,
+            failed=failed,
+        )
+
+        return JSONResponse(
+            content={
+                "results": results,
+                "total": len(results),
+                "successful": successful,
+                "failed": failed,
+            },
+            status_code=status.HTTP_201_CREATED,
+        )
+
+    except Exception as e:
+        logger.error("create_batch_sources_error", error=str(e), user_id=current_user["user_id"])
         return handle_api_error(e)

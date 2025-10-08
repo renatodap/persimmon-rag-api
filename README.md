@@ -10,6 +10,8 @@ FastAPI backend for Recall Notebook - AI-powered knowledge management system.
 - **Collections** - Organize sources into collections
 - **Semantic Search** - Vector search using Gemini embeddings
 - **Content Processing** - URL fetching, PDF processing
+- **Batch Operations** - Process up to 100 embeddings or 50 sources in parallel
+- **Webhooks** - Real-time event notifications with HMAC signatures
 - **Authentication** - JWT-based auth via Supabase
 - **Rate Limiting** - Redis-based rate limiting
 - **Production-Ready** - Structured logging, error handling, testing
@@ -137,8 +139,109 @@ response = claude.messages.create(
 ### Search (1 endpoint)
 - `POST /api/v1/search` - Semantic/keyword/hybrid search
 
-### Embeddings (1 endpoint)
-- `POST /api/v1/embeddings/generate` - Generate embedding
+### Embeddings (2 endpoints)
+- `POST /api/v1/embeddings/generate` - Generate single embedding
+- `POST /api/v1/embeddings/batch` - Generate embeddings for up to 100 texts in parallel
+
+### Webhooks (4 endpoints)
+- `POST /api/v1/webhooks` - Register webhook for real-time events
+- `GET /api/v1/webhooks` - List user's webhooks
+- `DELETE /api/v1/webhooks/{id}` - Delete webhook
+- `POST /api/v1/webhooks/test` - Test webhook delivery
+
+## Batch Operations
+
+### Batch Embeddings
+
+Process up to 100 texts in a single request:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/embeddings/batch \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {"text": "First document", "type": "summary", "index": 0},
+      {"text": "Second document", "type": "summary", "index": 1}
+    ]
+  }'
+```
+
+### Batch Sources
+
+Create up to 50 sources in a single request:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/sources/batch \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {
+        "title": "Article 1",
+        "content_type": "url",
+        "original_content": "Content...",
+        "summary_text": "Summary...",
+        "key_actions": ["Action 1"],
+        "key_topics": ["AI"],
+        "word_count": 500,
+        "index": 0
+      }
+    ]
+  }'
+```
+
+## Webhooks
+
+Receive real-time notifications when events occur (source created, updated, deleted, etc.).
+
+### Register Webhook
+
+```bash
+curl -X POST http://localhost:8000/api/v1/webhooks \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://myapp.com/webhooks/recall",
+    "events": ["source.created", "source.updated"],
+    "secret": "my-webhook-secret"
+  }'
+```
+
+### Webhook Payload Format
+
+```json
+{
+  "event": "source.created",
+  "timestamp": "2025-01-10T12:00:00Z",
+  "data": {
+    "source_id": "uuid-here",
+    "title": "New Article",
+    "content_type": "url"
+  },
+  "user_id": "user-uuid"
+}
+```
+
+### Verify Webhook Signature
+
+Webhooks are signed with HMAC-SHA256:
+
+```python
+import hmac
+import hashlib
+import json
+
+def verify_webhook(payload, signature, secret):
+    payload_str = json.dumps(payload, sort_keys=True)
+    expected = hmac.new(
+        secret.encode('utf-8'),
+        payload_str.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(signature, f"sha256={expected}")
+```
 
 ## Development
 
@@ -192,6 +295,7 @@ ANTHROPIC_API_KEY=xxx
 GOOGLE_GEMINI_API_KEY=xxx
 OPENAI_API_KEY=xxx
 JWT_SECRET=xxx
+WEBHOOK_SECRET=xxx (for signing webhook payloads)
 REDIS_URL=xxx (Railway Redis addon)
 ENVIRONMENT=production
 ```
@@ -229,6 +333,12 @@ backend/
 ## Environment Variables
 
 See `.env.example` for all required variables.
+
+## API Version
+
+**Current Version:** 1.1.0
+
+See [CHANGELOG.md](docs/CHANGELOG.md) for version history and release notes.
 
 ## License
 

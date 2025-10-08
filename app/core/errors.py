@@ -60,6 +60,13 @@ class AIServiceError(RecallNotebookException):
         super().__init__(message, status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
+class WebhookError(RecallNotebookException):
+    """Raised when webhook operation fails."""
+
+    def __init__(self, message: str = "Webhook operation failed."):
+        super().__init__(message, status.HTTP_400_BAD_REQUEST)
+
+
 async def recall_notebook_exception_handler(
     request: Request, exc: RecallNotebookException
 ) -> JSONResponse:
