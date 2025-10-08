@@ -27,11 +27,11 @@ railway login
 ### 3. Create New Railway Project
 
 ```bash
-# In the root of recall-notebook-api repository
+# In the root of persimmon-rag-api repository
 railway init
 ```
 
-Select "Create new project" and give it a name (e.g., "recall-notebook-api" or "recall-knowledge-api").
+Select "Create new project" and give it a name (e.g., "persimmon-rag-api" or "persimmon-rag-api").
 
 ### 4. Add Redis Addon
 
@@ -112,7 +112,7 @@ This opens the interactive Swagger UI where you can test all endpoints.
 
 ## Connect Frontend to Railway Backend
 
-If you're using the [recall-notebook](https://github.com/yourusername/recall-notebook) frontend, update its `.env.local`:
+If you're using the [recall-notebook](https://github.com/renatodap/recall-notebook) frontend, update its `.env.local`:
 
 ```bash
 NEXT_PUBLIC_API_URL=https://your-app.railway.app

@@ -17,7 +17,7 @@ This is a production-ready knowledge API designed specifically for RAG agents an
 - Document processing pipelines
 - Multi-agent systems
 
-> **Note**: This repository contains only the backend API. For the web UI client, see [recall-notebook](https://github.com/yourusername/recall-notebook).
+> **Note**: This repository contains only the backend API. For the web UI client, see [recall-notebook](https://github.com/renatodap/recall-notebook).
 
 ## 🚀 Quick Start for Agent Developers
 
@@ -62,8 +62,8 @@ See the [**Agent API Guide**](docs/AGENT_API_GUIDE.md) (150+ pages) for complete
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/yourusername/recall-notebook-api.git
-cd recall-notebook-api
+git clone https://github.com/renatodap/persimmon-rag-api.git
+cd persimmon-rag-api
 poetry install
 ```
 
@@ -349,7 +349,7 @@ railway up
 ## Project Structure
 
 ```
-recall-notebook-api/
+persimmon-rag-api/
 ├── app/
 │   ├── main.py              # FastAPI application entry point
 │   ├── config.py            # Environment configuration
@@ -407,8 +407,8 @@ See [CHANGELOG.md](docs/CHANGELOG.md) for version history and release notes.
 
 ## Related Repositories
 
-- **[recall-notebook](https://github.com/yourusername/recall-notebook)** - Web UI client for this API (Next.js)
-- **[Your RAG agent](https://github.com/yourusername/your-agent)** - Example agent using this API
+- **[recall-notebook](https://github.com/renatodap/recall-notebook)** - Web UI client for this API (Next.js)
+- **[Your RAG agent](https://github.com/renatodap/your-agent)** - Example agent using this API
 
 ## Contributing
 
@@ -422,8 +422,8 @@ Contributions are welcome! Please:
 ## Support
 
 - 📖 **Documentation**: [Agent API Guide](docs/AGENT_API_GUIDE.md)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/recall-notebook-api/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/recall-notebook-api/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/renatodap/persimmon-rag-api/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/renatodap/persimmon-rag-api/discussions)
 
 ## License
 
