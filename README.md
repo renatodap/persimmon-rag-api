@@ -2,6 +2,8 @@
 
 FastAPI backend for Recall Notebook - AI-powered knowledge management system.
 
+**🤖 Perfect for RAG Agents**: This API is designed as a **knowledge backend** for AI agents. It provides embeddings generation, semantic search, and content storage - everything you need for Retrieval-Augmented Generation (RAG). See the [Agent API Guide](docs/AGENT_API_GUIDE.md) to get started.
+
 ## Features
 
 - **Sources CRUD** - Create, read, update, delete sources with AI summaries
@@ -60,6 +62,58 @@ poetry run uvicorn app.main:app --reload
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+
+## 🤖 For AI Agent Developers
+
+This API is designed as a **knowledge backend** for RAG (Retrieval-Augmented Generation) agents. It handles:
+- ✅ Embeddings generation (FREE Gemini + OpenAI fallback)
+- ✅ Semantic search (pgvector with hybrid search)
+- ✅ Content storage and processing (URLs, PDFs, text)
+- ✅ Collection-based organization
+
+**Your agent service** (separate repo) should handle:
+- Chat/streaming responses
+- Conversation history
+- Tool calling orchestration
+- Agent memory
+
+### 📚 Complete Agent Documentation
+
+- **[Agent API Guide](docs/AGENT_API_GUIDE.md)** - Complete guide for RAG agent developers (150+ pages)
+- **[Python LangChain Example](docs/examples/python_langchain_agent.py)** - Full LangChain integration with tools
+- **[Python Custom Agent](docs/examples/python_custom_agent.py)** - Custom agent without frameworks
+- **[TypeScript Agent](docs/examples/typescript_agent.ts)** - Node.js/TypeScript implementation
+- **[curl Examples](docs/examples/curl_examples.sh)** - Complete API examples with RAG workflow
+
+### Quick RAG Example
+
+```python
+import httpx
+from anthropic import Anthropic
+
+# 1. Search knowledge base
+response = httpx.post("http://localhost:8000/api/v1/search", json={
+    "query": "machine learning transformers",
+    "mode": "hybrid",
+    "limit": 5
+}, headers={"Authorization": f"Bearer {token}"})
+
+results = response.json()["results"]
+
+# 2. Build context from results
+context = "\n\n".join([
+    f"[{r['source']['title']}]\n{r['summary']['summary_text']}"
+    for r in results
+])
+
+# 3. Use with Claude
+claude = Anthropic()
+response = claude.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    system=f"Context from knowledge base:\n{context}",
+    messages=[{"role": "user", "content": "Explain transformers"}]
+)
+```
 
 ## API Endpoints
 
