@@ -3,7 +3,7 @@ builder = "NIXPACKS"
 buildCommand = "pip install poetry && poetry config virtualenvs.create false && poetry install --without dev --no-root"
 
 [deploy]
-startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+startCommand = ". /opt/venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
