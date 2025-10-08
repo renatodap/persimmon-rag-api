@@ -276,8 +276,8 @@ async def fetch_url(
 
 @router.post("/process-pdf", response_model=ProcessPDFResponse)
 async def process_pdf(
+    current_user: CurrentUser,
     file: UploadFile = File(...),
-    current_user: CurrentUser = Depends(),
 ) -> JSONResponse:
     """Process PDF file and extract text."""
     try:
