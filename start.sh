@@ -38,4 +38,5 @@ echo "=== Testing app import ==="
 echo ""
 
 echo "=== Starting uvicorn ==="
-exec /opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+echo "Binding to 0.0.0.0:${PORT:-8000}"
+exec /opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
